@@ -355,7 +355,20 @@ async def handle(proxies, outfile, format):
             is_first = False
 
 
+def _suppress_trsock_warnings():
+    import warnings
+
+    # DeprecationWarning: Using send() method on sockets returned from get_extra_info('socket') will be prohibited in asyncio 3.9.
+    # Please report your use case to bugs.python.org.
+    warnings.filterwarnings('ignore', module='asyncio.trsock', lineno=20)
+    # DeprecationWarning: The loop argument is deprecated since Python 3.8, and scheduled for removal in Python 3.10.
+    warnings.filterwarnings('ignore', module='asyncio.events', lineno=80)
+
+
 def cli(args=sys.argv[1:]):
+    # disable warnings by default, only for CLI usage
+    _suppress_trsock_warnings()
+
     parser = create_parser()
     ns = parser.parse_args(args)
 
@@ -377,7 +390,7 @@ def cli(args=sys.argv[1:]):
         ns.types.append(('HTTP', ns.anon_lvl))
 
     loop = asyncio.get_event_loop()
-    proxies = asyncio.Queue(loop=loop)
+    proxies = asyncio.Queue()
     broker = Broker(
         proxies,
         max_conn=ns.max_conn,

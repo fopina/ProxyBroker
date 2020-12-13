@@ -94,7 +94,7 @@ class Broker:
             max_tries = attempts_conn
 
         # The maximum number of concurrent checking proxies
-        self._on_check = asyncio.Queue(maxsize=max_conn, loop=self._loop)
+        self._on_check = asyncio.Queue(maxsize=max_conn)
         self._max_tries = max_tries
         self._judges = judges
         self._providers = [
